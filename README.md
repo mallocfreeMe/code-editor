@@ -4,9 +4,9 @@ This is a Electron code editor
 
 ```bash
 # Clone this repository
-git clone https://github.com/electron/electron-quick-start
+git clone https://github.com/mallocfreeMe/code-editor
 # Go into the repository
-cd electron-quick-start
+cd code-editor
 # Install dependencies
 npm install
 # Run the app
