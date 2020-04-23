@@ -9,22 +9,35 @@
   <title id="file-name">Untitle</title>
   <link rel="stylesheet" type="text/css" href="css/grid.css">
   <link rel="stylesheet" type="text/css" href="css/main.css">
+
+  <!-- <link rel="stylesheet" href="node_modules/electron-tabs/electron-tabs.css"> -->
 </head>
 
 <body>
+
+  <header>
+    <nav class="grid">
+      <div class="grid-col-1of5 top-nav-heading">
+        <h2>EXPLORER</h2>
+      </div>
+
+      <div class="grid-col-4of5 top-nav-ul">
+        <div class="etabs-tabgroup">
+          <div class="etabs-tabs"></div>
+          <div class="etabs-buttons"></div>
+        </div>
+        <div class="etabs-views"></div>
+      </div>
+
+    </nav>
+  </header>
 
   <div class="grid">
 
     <div class="grid-col-1of5">
       <!-- side nav -->
-      <nav id="side-nav"></nav>
-      <ul>
-        <li>1</li>
-        <li>2</li>
-        <li>3</li>
-        <li>4</li>
-        <li>5</li>
-      </ul>
+      <nav id="side-nav">
+        <ul></ul>
       </nav>
     </div>
 
@@ -36,10 +49,8 @@
 
   <footer>
     <ul>
-      <li>1</li>
-      <li>2</li>
-      <li>3</li>
-      <li>4</li>
+      <li>pull</li>
+      <li>push</li>
     </ul>
   </footer>
 
