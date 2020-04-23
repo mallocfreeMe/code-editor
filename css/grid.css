@@ -1,0 +1,21 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.grid {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+}
+
+.grid-col-1of5 {
+    height: 100%;
+    flex: 1 1 20%;
+}
+
+.grid-col-4of5 {
+    height: 100%;
+    flex: 1 1 80%;
+}
