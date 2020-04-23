@@ -1,6 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 
+let editor = ace.edit("file-content");
+editor.setTheme("ace/theme/twilight");
+editor.session.setMode("ace/mode/javascript");
+
 document.addEventListener('drop', (e) => {
   e.preventDefault();
   e.stopPropagation();
@@ -17,7 +21,7 @@ document.addEventListener('drop', (e) => {
       }
       console.log("Asynchronous read: " + data.toString());
 
-      document.getElementById("file-content").innerHTML = data.toString();
+      editor.insert(data.toString());
     });
   }
 });

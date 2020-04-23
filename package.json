@@ -18,5 +18,10 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^8.2.3"
+  },
+  "dependencies": {
+    "dialog": "^0.3.1",
+    "menu": "^0.2.5",
+    "monaco-editor": "^0.20.0"
   }
 }
