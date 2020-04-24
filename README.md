@@ -1,5 +1,3 @@
-This is a Electron code editor
-
 ## To Use
 
 ```bash
