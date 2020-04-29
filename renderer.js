@@ -1,8 +1,6 @@
 let fs = require("fs");
 const path = require("path");
 
-let Mousetrap = require('mousetrap');
-
 let filePath = [];
 
 let editor = ace.edit("file-content");
@@ -10,11 +8,13 @@ editor.setTheme("ace/theme/dracula");
 editor.session.setMode("ace/mode/text");
 editor.$blockScrolling = Infinity;
 editor.setShowPrintMargin(false);
+editor.container.style.lineHeight = 1.5;
+editor.renderer.updateFontSize();
 
 editor.setOptions({
-  // editor options
   selectionStyle: 'line',// "line"|"text"
   highlightActiveLine: false, // boolean
+  highlightGutterLine: false, // boolean
   highlightSelectedWord: true, // boolean
   readOnly: false, // boolean: true if read only
   cursorStyle: 'ace', // "ace"|"slim"|"smooth"|"wide"
@@ -22,49 +22,6 @@ editor.setOptions({
   behavioursEnabled: true, // boolean: true if enable custom behaviours
   wrapBehavioursEnabled: true, // boolean
   autoScrollEditorIntoView: undefined, // boolean: this is needed if editor is inside scrollable page
-  keyboardHandler: null, // function: handle custom keyboard events
-  
-  // renderer options
-  // animatedScroll: false, // boolean: true if scroll should be animated
-  // displayIndentGuides: false, // boolean: true if the indent should be shown. See 'showInvisibles'
-  // showInvisibles: false, // boolean -> displayIndentGuides: true if show the invisible tabs/spaces in indents
-  // showPrintMargin: true, // boolean: true if show the vertical print margin
-  // printMarginColumn: 80, // number: number of columns for vertical print margin
-  // printMargin: undefined, // boolean | number: showPrintMargin | printMarginColumn
-  // showGutter: true, // boolean: true if show line gutter
-  // fadeFoldWidgets: false, // boolean: true if the fold lines should be faded
-  // showFoldWidgets: true, // boolean: true if the fold lines should be shown ?
-  // showLineNumbers: true,
-  // highlightGutterLine: false, // boolean: true if the gutter line should be highlighted
-  // hScrollBarAlwaysVisible: false, // boolean: true if the horizontal scroll bar should be shown regardless
-  // vScrollBarAlwaysVisible: false, // boolean: true if the vertical scroll bar should be shown regardless
-  // fontSize: 12, // number | string: set the font size to this many pixels
-  // fontFamily: undefined, // string: set the font-family css value
-  // maxLines: undefined, // number: set the maximum lines possible. This will make the editor height changes
-  // minLines: undefined, // number: set the minimum lines possible. This will make the editor height changes
-  // maxPixelHeight: 0, // number -> maxLines: set the maximum height in pixel, when 'maxLines' is defined. 
-  // scrollPastEnd: 0, // number -> !maxLines: if positive, user can scroll pass the last line and go n * editorHeight more distance 
-  // fixedWidthGutter: false, // boolean: true if the gutter should be fixed width
-  // theme: 'ace/theme/textmate', // theme string from ace/theme or custom?
- 
-  // mouseHandler options
-  // scrollSpeed: 2, // number: the scroll speed index
-  // dragDelay: 0, // number: the drag delay before drag starts. it's 150ms for mac by default 
-  // dragEnabled: true, // boolean: enable dragging
-  // focusTimout: 0, // number: the focus delay before focus starts.
-  // tooltipFollowsMouse: true, // boolean: true if the gutter tooltip should follow mouse
-
-  // session options
-  // firstLineNumber: 1, // number: the line number in first line
-  // overwrite: false, // boolean
-  // newLineMode: 'auto', // "auto" | "unix" | "windows"
-  // useWorker: true, // boolean: true if use web worker for loading scripts
-  // useSoftTabs: true, // boolean: true if we want to use spaces than tabs
-  // tabSize: 4, // number
-  // wrap: false, // boolean | string | number: true/'free' means wrap instead of horizontal scroll, false/'off' means horizontal scroll instead of wrap, and number means number of column before wrap. -1 means wrap at print margin
-  // indentedSoftWrap: true, // boolean
-  // foldStyle: 'markbegin', // enum: 'manual'/'markbegin'/'markbeginend'.
-  // mode: 'ace/mode/text' // string: path to language mode 
 });
 
 
@@ -113,6 +70,10 @@ document.addEventListener('drop', (e) => {
     // clean the editor and add drag content to it
     editor.setValue("");
     editor.insert(data.toString());
+    editor.gotoLine(1, 0);
+    const row = 1;
+    const col = 0;
+    document.getElementById("cursor-pos").innerHTML = "Ln " + row + ", " + "Col " + col;
   }
 });
 
@@ -122,19 +83,27 @@ document.addEventListener('dragover', (e) => {
 });
 
 // write file
-Mousetrap.bind("command+s", function () {
-  try {
+editor.commands.addCommand({
+  name: 'replace',
+  bindKey: { win: 'Ctrl-s', mac: 'Command-S' },
+  exec: function (editor) {
     for (let i = 0; i < filePath.length; i++) {
       if (document.getElementById(path.parse(filePath[i]).base).style.getPropertyValue("background-color") == "rgb(44, 49, 58)") {
         fs.writeFileSync(filePath[i], editor.getValue(), 'utf-8');
         break;
       }
     }
-  }
-  catch (e) {
-    alert('Failed to save the file !' + e);
-  }
+  },
+  readOnly: false
 });
+
+// display col and row in footer
+editor.on("click", function () {
+  const cursorPos = editor.getCursorPosition();
+  const row = (cursorPos.row + 1).toString();
+  const col = cursorPos.column.toString();
+  document.getElementById("cursor-pos").innerHTML = "Ln " + row + ", " + "Col " + col;
+})
 
 // append files to the side nav
 function appendToSideNav(fileName) {
@@ -167,6 +136,10 @@ function appendToSideNav(fileName) {
         document.getElementById("file-name").innerHTML = fileName;
         editor.setValue("");
         editor.insert(data.toString());
+        editor.gotoLine(1, 0);
+        const row = 1;
+        const col = 0;
+        document.getElementById("cursor-pos").innerHTML = "Ln " + row + ", " + "Col " + col;
       }
     }
   });
@@ -180,14 +153,18 @@ function setCurrentMode(fileName) {
   switch (currentMode) {
     case ".html":
       editor.session.setMode("ace/mode/html");
+      document.getElementById("file-format").innerHTML = "HTML";
       break;
     case ".css":
       editor.session.setMode("ace/mode/css");
+      document.getElementById("file-format").innerHTML = "CSS";
       break;
     case ".js":
       editor.session.setMode("ace/mode/javascript");
+      document.getElementById("file-format").innerHTML = "JavaScript";
       break;
     default:
       editor.session.setMode("ace/mode/text");
+      document.getElementById("file-format").innerHTML = "Plain Text";
   }
 }

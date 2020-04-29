@@ -8,19 +8,13 @@ html {
     width: 100%;
     height: 95vh;
     padding-top: 2em;
-    /* padding-left: 1em; */
     font-size: 1rem;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .grid-col-4of5 {
-    /* background-color: #282C34;
-    font-size: 1rem;
-    line-height: 1.5rem;
-    vertical-align: middle; */
     width: 100%;
     height: 95vh;
-    /* font-family: Verdana, Geneva, Tahoma, sans-serif; */
 }
 
 #top-nav {
@@ -67,6 +61,7 @@ footer {
     height: 5vh;
     background-color: #21252B;
     color: #ABB2BF;
+    font-family: sans-serif;
 }
 
 footer ul {
@@ -75,4 +70,16 @@ footer ul {
 
 footer ul li {
     display: inline;
+}
+
+#cursor-pos {
+    padding-top: 0.5em;
+    padding-right: 1em;
+    float: right;
+}
+
+#file-format {
+    padding-top: 0.5em;
+    padding-right: 1em;
+    float: right;
 }
