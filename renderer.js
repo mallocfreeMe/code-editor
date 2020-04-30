@@ -32,48 +32,60 @@ document.addEventListener('drop', (e) => {
 
   for (const f of e.dataTransfer.files) {
 
-    const fileName = path.parse(f.path).base;
+    // detect whether the drop item is a file or a folder
+    if (!fs.lstatSync(f.path).isDirectory()) {
+      const fileName = path.parse(f.path).base;
 
-    document.getElementById("file-name").innerHTML = fileName;
+      document.getElementById("file-name").innerHTML = fileName;
 
-    if (filePath.length == 0) {
-      filePath.push(f.path);
-      appendToSideNav(fileName);
-
-      document.getElementById(fileName).style.setProperty("background-color", "#2C313A");
-    } else {
-      let isSameFile = false;
-      for (let i = 0; i < filePath.length; i++) {
-        if (filePath[i] == f.path) {
-          isSameFile = true;
-        }
-      }
-      if (!isSameFile) {
+      if (filePath.length == 0) {
         filePath.push(f.path);
         appendToSideNav(fileName);
+
+        document.getElementById(fileName).style.setProperty("background-color", "#2C313A");
+      } else {
+        let isSameFile = false;
+        for (let i = 0; i < filePath.length; i++) {
+          if (filePath[i] == f.path) {
+            isSameFile = true;
+          }
+        }
+        if (!isSameFile) {
+          filePath.push(f.path);
+          appendToSideNav(fileName);
+        }
+
+        for (let i = 0; i < filePath.length; i++) {
+          let currentFile = document.getElementById(path.parse(filePath[i]).base);
+          currentFile.style.setProperty("background-color", "#21252B");
+        }
+
+        document.getElementById(fileName).style.setProperty("background-color", "#2C313A");
       }
 
-      for (let i = 0; i < filePath.length; i++) {
-        let currentFile = document.getElementById(path.parse(filePath[i]).base);
-        currentFile.style.setProperty("background-color", "#21252B");
-      }
+      // synchronous read
+      const data = fs.readFileSync(f.path);
 
-      document.getElementById(fileName).style.setProperty("background-color", "#2C313A");
+      // set current synatax highlighting 
+      setCurrentMode(fileName);
+
+      // clean the editor and add drag content to it
+      editor.setValue("");
+      editor.insert(data.toString());
+      editor.gotoLine(1, 0);
+      const row = 1;
+      const col = 0;
+      document.getElementById("cursor-pos").innerHTML = "Ln " + row + ", " + "Col " + col;
+    } else {
+      fs.readdirSync(f.path).forEach(fileName => {
+        // check similar folder path
+
+        // append to side-nav
+        
+        filePath.push(f.path + "/" + fileName);
+        appendToSideNav(fileName);
+      });
     }
-
-    // synchronous read
-    const data = fs.readFileSync(f.path);
-
-    // set current synatax highlighting 
-    setCurrentMode(fileName);
-
-    // clean the editor and add drag content to it
-    editor.setValue("");
-    editor.insert(data.toString());
-    editor.gotoLine(1, 0);
-    const row = 1;
-    const col = 0;
-    document.getElementById("cursor-pos").innerHTML = "Ln " + row + ", " + "Col " + col;
   }
 });
 
