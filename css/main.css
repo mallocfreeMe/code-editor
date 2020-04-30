@@ -10,6 +10,7 @@ html {
     padding-top: 2em;
     font-size: 1rem;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    overflow-y: scroll;
 }
 
 .grid-col-4of5 {

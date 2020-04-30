@@ -1,5 +1,6 @@
 let fs = require("fs");
 const path = require("path");
+let glob = require("glob");
 
 let filePath = [];
 
@@ -77,14 +78,29 @@ document.addEventListener('drop', (e) => {
       const col = 0;
       document.getElementById("cursor-pos").innerHTML = "Ln " + row + ", " + "Col " + col;
     } else {
-      fs.readdirSync(f.path).forEach(fileName => {
-        // check similar folder path
 
-        // append to side-nav
-        
-        filePath.push(f.path + "/" + fileName);
-        appendToSideNav(fileName);
+      let getDirectories = function (src, callback) {
+        glob(src + '/**/*', callback);
+      };
+      getDirectories(f.path, function (err, res) {
+        if (err) {
+          console.log('Error', err);
+        } else {
+          filePath.push(f.path);
+          appendToSideNav(path.parse(f.path).base);
+
+          res.forEach(allFilePath => {
+            filePath.push(allFilePath);
+            // appendToSideNav(path.parse(allFilePath).base);
+          });
+
+          const homePath = filePath[0];
+          const arr = filePath.filter(fs => (fs.split("/").length - 1 == homePath.split("/").length));
+
+          arr.map(a => appendToSideNav(path.parse(a).base));
+        }
       });
+
     }
   }
 });
@@ -128,31 +144,40 @@ function appendToSideNav(fileName) {
   li.setAttribute("id", fileName);
   li.setAttribute("onmouseover", "this.className='hover'");
   li.setAttribute("onmouseout", "this.className=''");
+
   li.addEventListener('click', event => {
     for (let i = 0; i < filePath.length; i++) {
 
-      const currentFileName = path.parse(filePath[i]).base;
+      // check if user click a folder or a file
+      // if its a file, then read the file
+      // if its a folder, then open the folder, show all sub files
+      if (!fs.lstatSync(filePath[i]).isDirectory()) {
+        const currentFileName = path.parse(filePath[i]).base;
 
-      document.getElementById(currentFileName).style.setProperty("background-color", "#21252B");
+        // document.getElementById(currentFileName).style.setProperty("background-color", "#21252B");
 
-      if (fileName == currentFileName) {
-        // synchronous read
-        const data = fs.readFileSync(filePath[i]);
+        if (fileName == currentFileName) {
+          // synchronous read
+          const data = fs.readFileSync(filePath[i]);
 
-        document.getElementById(fileName).style.setProperty("background-color", "#2C313A");
+          // document.getElementById(fileName).style.setProperty("background-color", "#2C313A");
 
 
-        // set current synatax highlighting 
-        setCurrentMode(fileName);
+          // set current synatax highlighting 
+          setCurrentMode(fileName);
 
-        document.getElementById("file-name").innerHTML = fileName;
-        editor.setValue("");
-        editor.insert(data.toString());
-        editor.gotoLine(1, 0);
-        const row = 1;
-        const col = 0;
-        document.getElementById("cursor-pos").innerHTML = "Ln " + row + ", " + "Col " + col;
+          document.getElementById("file-name").innerHTML = fileName;
+          editor.setValue("");
+          editor.insert(data.toString());
+          editor.gotoLine(1, 0);
+          const row = 1;
+          const col = 0;
+          document.getElementById("cursor-pos").innerHTML = "Ln " + row + ", " + "Col " + col;
+        }
+      } else {
+        console.log("it's folder");
       }
+
     }
   });
   ul.appendChild(li);
