@@ -1,8 +1,9 @@
-let fs = require("fs");
+const fs = require("fs");
 const path = require("path");
-let glob = require("glob");
+const glob = require("glob");
 
 let filePath = [];
+let firstTime = true;
 
 let editor = ace.edit("file-content");
 editor.setTheme("ace/theme/dracula");
@@ -85,12 +86,18 @@ document.addEventListener('drop', (e) => {
         if (err) {
           console.log('Error', err);
         } else {
+
+          filePath.push(f.path);
+          appendToSideNav(f.path);
+
           fs.readdirSync(f.path).sort(function (a, b) {
             return a.toLowerCase().localeCompare(b.toLowerCase());
           }).filter(a => !a.includes(".DS_Store") && !a.includes(".git")).forEach(fileName => {
             filePath.push(f.path + "/" + fileName);
             appendToSideNav(f.path + "/" + fileName);
           });
+
+          firstTime = false;
         }
       });
 
@@ -132,11 +139,19 @@ editor.on("click", function () {
 // if its a folder, then open the folder, show all sub files
 function appendToSideNav(fileAdress) {
   let ul = document.getElementById("side-nav");
+
   let li = document.createElement("li");
   li.appendChild(document.createTextNode(path.parse(fileAdress).base));
   li.style.setProperty("list-style", "none");
-  li.style.setProperty("padding-left", "30%");
+  li.style.setProperty("padding-left", "10%");
   li.style.setProperty("cursor", "pointer");
+  li.style.setProperty("-webkit-touch-callout", "none");
+  li.style.setProperty("-webkit-user-select", "none");
+  li.style.setProperty("-khtml-user-select", "none");
+  li.style.setProperty("-moz-user-select", "none");
+  li.style.setProperty("-ms-user-select", "none");
+  li.style.setProperty("user-select", "none");
+
   li.setAttribute("id", fileAdress);
   li.setAttribute("onmouseover", "this.className='hover'");
   li.setAttribute("onmouseout", "this.className=''");
@@ -163,7 +178,6 @@ function appendToSideNav(fileAdress) {
           const col = 0;
           document.getElementById("cursor-pos").innerHTML = "Ln " + row + ", " + "Col " + col;
         } else {
-          // const arr = filePath.filter(fs => (fs.split("/").length - 1 == homePath.split("/").length));
           let flag = true;
 
           filePath.filter(a => a.includes(filePath[i])).forEach(a => {
@@ -176,14 +190,14 @@ function appendToSideNav(fileAdress) {
             read(filePath[i]);
           } else {
 
-            let flag2 = false;
+            let flag2 = true;
 
             filePath.filter(a => a.includes(filePath[i])).filter(a => a.split("/")
               .length - 1 > filePath[i].split("/").length - 1)
               .forEach(a => {
                 if (document.getElementById(a).style.getPropertyValue("display") == "block") {
                   flag2 = true;
-                } else {
+                } else if (document.getElementById(a).style.getPropertyValue("display") == "none") {
                   flag2 = false;
                 }
               });
@@ -204,7 +218,22 @@ function appendToSideNav(fileAdress) {
 
     }
   });
-  ul.appendChild(li);
+
+  let list = ul.getElementsByTagName("li");
+
+  if (firstTime) {
+    ul.appendChild(li);
+  } else {
+    for (let i = 0; i < list.length; i++) {
+      if (li.id.includes(list[i].id) && li.id.split("/").length - 1 == list[i].id.split("/").length - 1 + 1) {
+        // let padding = (li.id.split("/").length - 1) * 5 + "%";
+        // li.style.setProperty("padding-left", padding);
+        list[i].after(li);
+        break;
+      }
+    }
+  }
+
 }
 
 // detect current file syntax
@@ -230,6 +259,7 @@ function setCurrentMode(filePath) {
   }
 }
 
+// read folder
 function read(path) {
   fs.readdirSync(path).sort(function (a, b) {
     return a.toLowerCase().localeCompare(b.toLowerCase());
