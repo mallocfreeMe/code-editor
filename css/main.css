@@ -34,8 +34,13 @@ html {
 }
 
 .ace_content {
+    /* background-color: #282C34; */
     /* padding-top: 0.5em; */
 }
+
+/* .ace_line {
+    color: white;
+} */
 
 .ace_gutter-layer {
     /* color: #ABB2BF; */

@@ -6,6 +6,7 @@ let filePath = [];
 let firstTime = true;
 
 let editor = ace.edit("file-content");
+ace.require("ace/ext/language_tools");
 editor.setTheme("ace/theme/dracula");
 editor.session.setMode("ace/mode/text");
 editor.$blockScrolling = Infinity;
@@ -24,6 +25,9 @@ editor.setOptions({
   behavioursEnabled: true, // boolean: true if enable custom behaviours
   wrapBehavioursEnabled: true, // boolean
   autoScrollEditorIntoView: undefined, // boolean: this is needed if editor is inside scrollable page
+  enableBasicAutocompletion: true,
+  enableSnippets: true,
+  enableLiveAutocompletion: true
 });
 
 
@@ -241,17 +245,29 @@ function setCurrentMode(filePath) {
   let currentMode = path.extname(path.parse(filePath).base);
 
   switch (currentMode) {
-    case ".html":
-      editor.session.setMode("ace/mode/html");
-      document.getElementById("file-format").innerHTML = "HTML";
+    case ".c":
+      editor.session.setMode("ace/mode/c_cpp");
+      document.getElementById("file-format").innerHTML = "C/C++";
+      break;
+    case ".cpp":
+      editor.session.setMode("ace/mode/c_cpp");
+      document.getElementById("file-format").innerHTML = "C/C++";
       break;
     case ".css":
       editor.session.setMode("ace/mode/css");
       document.getElementById("file-format").innerHTML = "CSS";
       break;
+    case ".html":
+      editor.session.setMode("ace/mode/html");
+      document.getElementById("file-format").innerHTML = "HTML";
+      break;
     case ".js":
       editor.session.setMode("ace/mode/javascript");
       document.getElementById("file-format").innerHTML = "JavaScript";
+      break;
+    case ".py":
+      editor.session.setMode("ace/mode/python");
+      document.getElementById("file-format").innerHTML = "Python";
       break;
     default:
       editor.session.setMode("ace/mode/text");
