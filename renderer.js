@@ -27,7 +27,9 @@ editor.setOptions({
   autoScrollEditorIntoView: undefined, // boolean: this is needed if editor is inside scrollable page
   enableBasicAutocompletion: true,
   enableSnippets: true,
-  enableLiveAutocompletion: true
+  enableLiveAutocompletion: true,
+  // number of page sizes to scroll after document end (typical values are 0, 0.5, and 1)
+  scrollPastEnd: 1
 });
 
 
@@ -261,6 +263,14 @@ function setCurrentMode(filePath) {
       editor.session.setMode("ace/mode/html");
       document.getElementById("file-format").innerHTML = "HTML";
       break;
+    case ".md":
+      editor.session.setMode("ace/mode/markdown");
+      document.getElementById("file-format").innerHTML = "Markdown";
+      break;
+    case ".json":
+      editor.session.setMode("ace/mode/json");
+      document.getElementById("file-format").innerHTML = "Json";
+      break;
     case ".js":
       editor.session.setMode("ace/mode/javascript");
       document.getElementById("file-format").innerHTML = "JavaScript";
@@ -284,3 +294,66 @@ function read(path) {
     appendToSideNav(path + "/" + fileName);
   });
 }
+
+const os = require('os');
+const pty = require('node-pty');
+const Terminal = require('xterm').Terminal;
+const FitAddon = require('xterm-addon-fit').FitAddon;
+
+// Initialize node-pty with an appropriate shell
+const shell = process.env[os.platform() === 'win32' ? 'COMSPEC' : 'SHELL'];
+const ptyProcess = pty.spawn(shell, [], {
+  name: 'xterm-color',
+  cols: 80,
+  rows: 30,
+  cwd: process.cwd(),
+  env: process.env
+});
+
+// Initialize xterm.js and attach it to the DOM
+let xterm = new Terminal({
+  fontFamily: 'Fira Code, Iosevka, monospace',
+  fontSize: 14,
+  experimentalCharAtlas: 'dynamic',
+  theme: {
+    background: '#282A35',
+  },
+  cursorStyle: 'bar',
+  cursorBlink: true,
+  // lineHeight: 1.2
+});
+let fitAddon = new FitAddon();
+xterm.loadAddon(fitAddon);
+xterm.open(document.getElementById('terminal'));
+fitAddon.fit();
+
+xterm.prompt = () => {
+  xterm.write('\r\n$ ');
+};
+
+xterm.prompt();
+xterm.focus();
+
+// set up communication between xterm and pty
+xterm.onData(data => ptyProcess.write(data));
+ptyProcess.on('data', function (data) {
+  xterm.write(data);
+});
+
+const terminal_container = document.getElementById("terminal");
+terminal_container.style.setProperty("display", "none");
+
+const terminal_icon = document.getElementById("terminal-icon-img");
+terminal_icon.style.setProperty("cursor", "pointer");
+terminal_icon.setAttribute("onmouseover", "this.className='hover'");
+terminal_icon.setAttribute("onmouseout", "this.className=''");
+
+let count = 1;
+terminal_icon.addEventListener('click', event => {
+  count++;
+  if (count % 2) {
+    terminal_container.style.setProperty("display", "none");
+  } else {
+    terminal_container.style.setProperty("display", "block");
+  }
+});

@@ -9,6 +9,7 @@
   <title id="file-name">untitled</title>
   <link rel="stylesheet" type="text/css" href="css/grid.css">
   <link rel="stylesheet" type="text/css" href="css/main.css">
+  <link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
 </head>
 
 <body>
@@ -23,12 +24,14 @@
     <div class="grid-col-4of5">
       <div id="top-nav"></div>
       <div id="file-content"></div>
+      <div id="terminal"></div>
     </div>
 
   </div>
 
   <footer>
     <ul>
+      <li id="terminal-icon"><img id="terminal-icon-img" src="img/terminal-icon.png" alt="terminal button"></li>
       <li id="file-format">Plain Text</li>
       <li id="cursor-pos">Ln 0, Col 0</li>
     </ul>
@@ -37,6 +40,7 @@
   <!-- You can also require other files to run in this process -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ext-language_tools.js"></script>
+  <script src="node_modules/xterm/lib/xterm.js"></script>
 
   <script src="./renderer.js"></script>
 
