@@ -269,7 +269,7 @@ function setCurrentMode(filePath) {
       break;
     case ".json":
       editor.session.setMode("ace/mode/json");
-      document.getElementById("file-format").innerHTML = "Json";
+      document.getElementById("file-format").innerHTML = "JSON";
       break;
     case ".js":
       editor.session.setMode("ace/mode/javascript");
@@ -295,6 +295,7 @@ function read(path) {
   });
 }
 
+// terminal support starts from here
 const os = require('os');
 const pty = require('node-pty');
 const Terminal = require('xterm').Terminal;
@@ -320,7 +321,6 @@ let xterm = new Terminal({
   },
   cursorStyle: 'bar',
   cursorBlink: true,
-  // lineHeight: 1.2
 });
 let fitAddon = new FitAddon();
 xterm.loadAddon(fitAddon);
@@ -340,6 +340,8 @@ ptyProcess.on('data', function (data) {
   xterm.write(data);
 });
 
+// add click event to terminal icon
+// click to show it, click one time, hide it
 const terminal_container = document.getElementById("terminal");
 terminal_container.style.setProperty("display", "none");
 
